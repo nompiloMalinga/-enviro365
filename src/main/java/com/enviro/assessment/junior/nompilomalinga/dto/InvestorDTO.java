@@ -11,9 +11,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InvestorDTO {
+
+    private Long id;
     private String name;
     private String surname;
     private int age;
-    private double balance;
     private List<ProductDTO> products;
 }

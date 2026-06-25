@@ -8,7 +8,6 @@ import com.enviro.assessment.junior.nompilomalinga.repository.InvestorRepository
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,12 +34,13 @@ public class InvestorService {
 
     private InvestorDTO convertEntityToDto(Investor investor){
         InvestorDTO investorDTO = new InvestorDTO();
+        investorDTO.setId(investor.getId());
         investorDTO.setName(investor.getName());
         investorDTO.setSurname(investor.getSurname());
         investorDTO.setAge(investor.getAge());
         investorDTO.setProducts(investor.getProducts()
                 .stream()
-                .map(product -> new ProductDTO(product.getProductType(), product.getBalance()))
+                .map(product -> new ProductDTO(product.getId(), product.getProductType(), product.getBalance()))
                 .collect(Collectors.toList()));
 
         return  investorDTO;

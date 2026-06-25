@@ -6,7 +6,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductDTO {
-
+    private  Long id;
     private String productType;
     private double balance;
 }
