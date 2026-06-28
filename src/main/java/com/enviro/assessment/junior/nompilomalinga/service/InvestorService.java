@@ -5,9 +5,9 @@ import com.enviro.assessment.junior.nompilomalinga.dto.ProductDTO;
 import com.enviro.assessment.junior.nompilomalinga.entity.Investor;
 import com.enviro.assessment.junior.nompilomalinga.entity.Product;
 import com.enviro.assessment.junior.nompilomalinga.repository.InvestorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,6 +20,11 @@ public class InvestorService {
     }
 
     public InvestorDTO saveInvestorDetails(Investor investor){
+        if (investor.getProducts() != null) {
+            for (Product product : investor.getProducts()) {
+                product.setInvestor(investor);
+            }
+        }
         return convertEntityToDto(investorRepository.save(investor)) ;
 
     }
@@ -29,6 +34,13 @@ public class InvestorService {
                 .orElseThrow(() -> new RuntimeException("Investor not found"));
         return  convertEntityToDto(investor);
 
+    }
+
+    public List<InvestorDTO> getAllInvestors() {
+        return investorRepository.findAll()
+                .stream()
+                .map(this::convertEntityToDto)
+                .collect(Collectors.toList());
     }
 
 
@@ -43,6 +55,6 @@ public class InvestorService {
                 .map(product -> new ProductDTO(product.getId(), product.getProductType(), product.getBalance()))
                 .collect(Collectors.toList()));
 
-        return  investorDTO;
+        return investorDTO;
     }
 }

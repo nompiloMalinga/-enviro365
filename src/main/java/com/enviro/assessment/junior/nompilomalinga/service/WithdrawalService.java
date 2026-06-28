@@ -10,6 +10,8 @@ import com.enviro.assessment.junior.nompilomalinga.repository.WithdrawalReposito
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -67,7 +69,12 @@ public class WithdrawalService {
         return withdrawal_dto;
     }
 
-
+    public List<WithdrawalRequestDTO> getWithdrawalHistory(Long investorId) {
+        return withdrawalRepository.findByInvestorId(investorId)
+                .stream()
+                .map(this::convertEntityToDto)
+                .collect(Collectors.toList());
+    }
 
 
 
