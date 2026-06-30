@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class WithdrawalRequestDTO {
+public class WithdrawalDTO {
 
     private Long investorId;
     private Long productId;

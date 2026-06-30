@@ -19,6 +19,13 @@ public class InvestorService {
         this.investorRepository = investorRepository;
     }
 
+
+    /**
+     * Saves a new investor together with their products.
+     *
+     * @param investor Investor entity received from the client.
+     * @return Saved investor as a DTO.
+     */
     public InvestorDTO saveInvestorDetails(Investor investor){
         if (investor.getProducts() != null) {
             for (Product product : investor.getProducts()) {

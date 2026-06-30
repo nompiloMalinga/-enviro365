@@ -1,6 +1,6 @@
 package com.enviro.assessment.junior.nompilomalinga.service;
 
-import com.enviro.assessment.junior.nompilomalinga.dto.WithdrawalRequestDTO;
+import com.enviro.assessment.junior.nompilomalinga.dto.WithdrawalDTO;
 import com.enviro.assessment.junior.nompilomalinga.entity.Investor;
 import com.enviro.assessment.junior.nompilomalinga.entity.Product;
 import com.enviro.assessment.junior.nompilomalinga.entity.Withdrawal;
@@ -17,6 +17,13 @@ import java.util.stream.Collectors;
 @Service
 public class WithdrawalService {
 
+
+    /**
+     * Service class responsible for handling all withdrawal-related business logic.
+     * Enforces business rules such as age restrictions, balance limits,
+     * and maximum withdrawal percentages before processing a withdrawal notice.
+     */
+
     private final WithdrawalRepository withdrawalRepository;
     private final InvestorRepository investorRepository;
     private final ProductRepository productRepository;
@@ -28,28 +35,44 @@ public class WithdrawalService {
         this.productRepository = productRepository;
     }
 
-    public WithdrawalRequestDTO withdrawalNotices(WithdrawalRequestDTO withdrawalRequestDTO) {
-        Investor investor = investorRepository.findById(withdrawalRequestDTO.getInvestorId())
+    /**
+     * Processes a withdrawal notice by validating business rules,
+     * deducting the withdrawal amount from the product balance,
+     * and persisting the withdrawal record.
+     * Business rules enforced:
+     * - Retirement product withdrawals are only allowed for investors aged above 65
+     * - Withdrawal amount must not exceed the current product balance
+     * - Withdrawal amount must not exceed 90% of the product balance
+     *
+     * @param withdrawalDTO the withdrawal request containing investor ID,
+     *                             product ID, and withdrawal amount
+     * @return a DTO representing the saved withdrawal record
+     * @throws RuntimeException if investor or product is not found,
+     *                          or if any business rule is violated
+     */
+
+    public WithdrawalDTO withdrawalNotices(WithdrawalDTO withdrawalDTO) {
+        Investor investor = investorRepository.findById(withdrawalDTO.getInvestorId())
                 .orElseThrow(() -> new RuntimeException("Investor not found"));
 
-        Product product = productRepository.findById(withdrawalRequestDTO.getProductId())
+        Product product = productRepository.findById(withdrawalDTO.getProductId())
                 .orElseThrow(()-> new RuntimeException("Product not found"));
 
         if(product.getProductType().equalsIgnoreCase("Retirement") && investor.getAge()<= 65){
             throw new RuntimeException("Investor must be over 65 for retirement withdrawal");
         }
-        if(withdrawalRequestDTO.getAmount()> product.getBalance()){
+        if(withdrawalDTO.getAmount()> product.getBalance()){
             throw new RuntimeException("Withdrawal amount exceeds product balance");
         }
-        if (withdrawalRequestDTO.getAmount() > product.getBalance() * 0.90){
+        if (withdrawalDTO.getAmount() > product.getBalance() * 0.90){
             throw  new RuntimeException("Withdrawal cannot exceed 90% of product balance");
         }
 
-        product.setBalance(product.getBalance() - withdrawalRequestDTO.getAmount());
+        product.setBalance(product.getBalance() - withdrawalDTO.getAmount());
         productRepository.save(product);
 
         Withdrawal withdrawal = new Withdrawal();
-        withdrawal.setAmount(withdrawalRequestDTO.getAmount());
+        withdrawal.setAmount(withdrawalDTO.getAmount());
         withdrawal.setWithdrawalDate(LocalDateTime.now());
         withdrawal.setStatus("Successful");
         withdrawal.setInvestor(investor);
@@ -59,8 +82,8 @@ public class WithdrawalService {
 
     }
 
-    private WithdrawalRequestDTO convertEntityToDto(Withdrawal withdrawal) {
-        WithdrawalRequestDTO withdrawal_dto = new WithdrawalRequestDTO();
+    private WithdrawalDTO convertEntityToDto(Withdrawal withdrawal) {
+        WithdrawalDTO withdrawal_dto = new WithdrawalDTO();
         withdrawal_dto.setInvestorId(withdrawal.getInvestor().getId());
         withdrawal_dto.setProductId(withdrawal.getProduct().getId());
         withdrawal_dto.setAmount(withdrawal.getAmount());
@@ -69,8 +92,9 @@ public class WithdrawalService {
         return withdrawal_dto;
     }
 
-    public List<WithdrawalRequestDTO> getWithdrawalHistory(Long investorId) {
-        return withdrawalRepository.findByInvestorId(investorId)
+
+    public List<WithdrawalDTO> getAllWithdrawalHistory() {
+        return withdrawalRepository.findAll()
                 .stream()
                 .map(this::convertEntityToDto)
                 .collect(Collectors.toList());

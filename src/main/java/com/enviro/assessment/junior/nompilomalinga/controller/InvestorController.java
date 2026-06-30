@@ -7,8 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/investors")
+@CrossOrigin(origins = "http://localhost:4200")
 public class InvestorController {
 
     private final InvestorService investorService;
@@ -28,6 +31,11 @@ public class InvestorController {
     @GetMapping("/{id}")
     public ResponseEntity<InvestorDTO> getInvestorById(@PathVariable Long id) {
         return ResponseEntity.ok(investorService.getInvestorById(id));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<InvestorDTO>>getAllInvestors(){
+        return ResponseEntity.ok(investorService.getAllInvestors());
     }
 
 }
