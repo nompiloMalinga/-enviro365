@@ -1,7 +1,7 @@
 package com.enviro.assessment.junior.nompilomalinga.controller;
 
 
-import com.enviro.assessment.junior.nompilomalinga.dto.WithdrawalRequestDTO;
+import com.enviro.assessment.junior.nompilomalinga.dto.WithdrawalDTO;
 import com.enviro.assessment.junior.nompilomalinga.service.CsvExportService;
 import com.enviro.assessment.junior.nompilomalinga.service.WithdrawalService;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/withdrawals")
+@CrossOrigin(origins = "http://localhost:4200")
 public class WithdrawalController {
 
     private final WithdrawalService withdrawalService;
@@ -25,16 +26,14 @@ public class WithdrawalController {
         this.csvExportService = csvExportService;
     }
 
-
     @PostMapping
-    public ResponseEntity<WithdrawalRequestDTO> processWithdrawal(@RequestBody WithdrawalRequestDTO withdrawalDTO) {
+    public ResponseEntity<WithdrawalDTO> processWithdrawal(@RequestBody WithdrawalDTO withdrawalDTO) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(withdrawalService.withdrawalNotices(withdrawalDTO));
     }
-
-    @GetMapping("/{investorId}")
-    public ResponseEntity<List<WithdrawalRequestDTO>> getWithdrawalHistory(@PathVariable Long investorId) {
-        return ResponseEntity.ok(withdrawalService.getWithdrawalHistory(investorId));
+    @GetMapping("/history")
+    public ResponseEntity<List<WithdrawalDTO>> getAllWithdrawals() {
+        return ResponseEntity.ok(withdrawalService.getAllWithdrawalHistory());
     }
 
     @GetMapping("/{investorId}/export")

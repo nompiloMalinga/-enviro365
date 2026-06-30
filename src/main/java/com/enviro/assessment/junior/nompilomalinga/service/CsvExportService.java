@@ -27,10 +27,11 @@ public class CsvExportService {
                 .toList();
 
         StringBuilder csv = new StringBuilder();
-        csv.append("Amount,Date,Status,Product Type\n");
+        csv.append("Amount,Date,Time,Status,Product, Type\n");
         for (Withdrawal w : withdrawals) {
             csv.append(w.getAmount()).append(",")
-                    .append(w.getWithdrawalDate()).append(",")
+                    .append(w.getWithdrawalDate().toLocalDate()).append(",")
+                    .append(w.getWithdrawalDate().toLocalTime().withNano(0)).append(",")
                     .append(w.getStatus()).append(",")
                     .append(w.getProduct().getProductType()).append("\n");
         }
